@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="style.css">
+<title>チャットアプリ</title>
+</head>
+<body>
+
+<!-- コンテンツ表示画面 -->
+
+    <div class="container">
+            <div class="chat-title">らいんあぷり</div>
+                <!-- 送信したら表示されるテキスト -->
+                <div class="chat-area" id="output"></div>    
+            <!-- </div> -->
+
+            <!--メッセージとボタン  -->
+            <div class="messagearea">
+                <div class="messagearea-name">
+                    <div class="name"> 名前：<input type="text" id="username"> </div>
+                </div>
+
+                <div class="textbutton-area">
+                    <textarea class="textarea" id="text" cols="30" rows="5"></textarea>
+                    <button class="buttonarea" id="send">送信</button>
+                </div>
+            </div>
+            </div>
+    </div>
+<!--/ コンテンツ表示画面 -->
+
+
+<!-- JQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- JQuery -->
+
+<!--** 以下Firebase **-->
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+
+    // 追加1
+    import {
+      getDatabase,
+      ref,
+      push,
+      set,
+      onChildAdded,
+      remove,
+      onChildRemoved,
+    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAPTCBG0eLLcralJz_VpgTwtYlGk8mJH28",
+      authDomain: "gsdemo-d5701.firebaseapp.com",
+      projectId: "gsdemo-d5701",
+      storageBucket: "gsdemo-d5701.appspot.com",
+      messagingSenderId: "212019587174",
+      appId: "1:212019587174:web:e87f11297c0ca1c82825a7",
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+
+    // 追加2
+    const db = getDatabase(app); //RealtimeDBに接続
+    const dbRef = ref(db, "chat"); //RealtimeDB内の"chat"を使う
+
+
+    $("#send").on("click", function(){
+        const username = $("#username").val();
+        const text = $("#text").val();
+        // alert(username + text);
+
+        const msg = {
+            username: $("#username").val(),
+            text: $("#text").val()
+        };
+
+        const newPostRef = push(dbRef);
+        set(newPostRef, msg);
+
+        // メッセージをテキストエリアから消す記述
+        $("#username").val("");
+        $("#text").val("");
+
+
+        });
+
+        //ここから受信処理
+      onChildAdded(dbRef, function (date) {
+        const msg = date.val();
+        const key = date.key;
+        console.log("key", key); //コンソールで確認甩
+       
+        let hh = `<p>${msg.username}<br>${msg.text}</p>`;
+        $("#output").append(hh);
+
+
+      });
+       
+</script>
+
+
+</body>
+</html>
